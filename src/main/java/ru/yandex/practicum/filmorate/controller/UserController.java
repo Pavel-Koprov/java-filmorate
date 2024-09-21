@@ -27,7 +27,7 @@ public class UserController {
 
         if (newUser == null) {
             log.error("пустой объект пользователя");
-            throw new ValidationException("нет обновлённых данных пользователя");
+            return newUser;
         }
 
         if (newUser.getId() == null) {
@@ -39,15 +39,6 @@ public class UserController {
             User oldUser = users.get(newUser.getId());
 
             if (newUser.getEmail() == null || newUser.getEmail().isBlank() || !newUser.getEmail().contains("@")) {
-
-                if (users.values().stream()
-                        .filter(currentUser -> !newUser.getId().equals(currentUser.getId()))
-                        .map(User::getEmail)
-                        .anyMatch(email -> email.equals(newUser.getEmail()))) {
-                    log.error("пользователь ввёл уже используемый email");
-                    throw new ValidationException("электронная почта не должна быть уже использована" +
-                            " другим пользователем");
-                }
                 log.error("пользователь ввёл неверный email");
                 throw new ValidationException("электронная почта не может быть пустой и должна содержать символ @");
             } else if (newUser.getLogin() == null || newUser.getLogin().isBlank() ||
@@ -64,7 +55,7 @@ public class UserController {
             oldUser.setBirthday(newUser.getBirthday());
             oldUser.setName(newUser.getName());
 
-            if (newUser.getName() == null || newUser.getName().isBlank()) {
+            if (newUser.getName() == null) {
                 log.info("имя пользователя - его логин");
                 oldUser.setName(oldUser.getLogin());
             }
@@ -99,7 +90,7 @@ public class UserController {
         } else if (user.getLogin() == null || user.getLogin().isBlank() || user.getLogin().contains(" ")) {
             log.error("пользователь ввёл неверный логин");
             throw new ValidationException("логин не может быть пустым и содержать пробелы");
-        } else if (user.getName() == null || user.getName().isBlank()) {
+        } else if (user.getName() == null) {
             log.info("имя пользователя - его логин");
             user.setName(user.getLogin());
         } else if (user.getBirthday() == null || user.getBirthday().isAfter(LocalDate.now())) {
