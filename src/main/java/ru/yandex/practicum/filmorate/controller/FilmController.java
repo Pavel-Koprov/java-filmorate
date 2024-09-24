@@ -18,6 +18,8 @@ public class FilmController {
 
     private final Map<Integer, Film> films = new HashMap<>();
     private int filmId = 0;
+    private static final LocalDate MOVIE_BIRTHDAY = LocalDate.of(1895, 12, 28);
+    private static final Long MAX_DESCRIPTION_LENGTH = 200L;
 
     @GetMapping
     public Collection<Film> findAll() {
@@ -27,7 +29,7 @@ public class FilmController {
 
     @PostMapping
     public Film create(@Valid @RequestBody Film newFilm) {
-        log.info("Выполнение запроса на создание нового фильма " + newFilm.getName());
+        log.info("Выполнение запроса на создание нового фильма {}", newFilm);
         filmValidation(newFilm);
         newFilm.setId(getNextId());
         films.put(newFilm.getId(), newFilm);
@@ -36,7 +38,7 @@ public class FilmController {
 
     @PutMapping
     public Film update(@Valid @RequestBody Film newFilm) {
-        log.info("Выполнение запроса на обновление фильма " + newFilm.getName());
+        log.info("Выполнение запроса на обновление фильма {}", newFilm);
         filmValidation(newFilm);
         Film film = films.get(newFilm.getId());
         film.setName(newFilm.getName());
@@ -51,15 +53,15 @@ public class FilmController {
     }
 
     private void filmValidation(Film newFilm) {
-        if (newFilm.getName() == null || newFilm.getName().isEmpty()) {
+        if (newFilm.getName() == null || newFilm.getName().isBlank()) {
             log.error("Пользователь попытался создать новый фильм с пустым названием");
             throw new ValidationExceptions("Название фильма не должно быть пустым");
         }
-        if (newFilm.getDescription().isEmpty() || newFilm.getDescription().length() > 200) {
+        if (newFilm.getDescription().isBlank() || newFilm.getDescription().length() > MAX_DESCRIPTION_LENGTH) {
             log.error("Пользователь попытался создать новый фильм с пустым описанием или длинной более 200 символов");
             throw new ValidationExceptions("Введенное описание должно быть не более 200 символов");
         }
-        if (newFilm.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
+        if (newFilm.getReleaseDate() == null || newFilm.getReleaseDate().isBefore(MOVIE_BIRTHDAY)) {
             log.error("Пользователь попытался создать новый фильм с датой релиза раньше 28.12.1895 года");
             throw new ValidationExceptions("Дата выxода фильма не может быть раньше 28.12.1895 года");
         }

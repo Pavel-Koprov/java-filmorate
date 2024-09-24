@@ -27,7 +27,7 @@ public class UserController {
 
     @PostMapping
     public User create(@Valid @RequestBody User newUser) {
-        log.info("Выполнение запроса на создание пользователя " + newUser.getLogin());
+        log.info("Выполнение запроса на создание пользователя {}", newUser);
         userValidation(newUser);
         newUser.setId(getNextId());
         if (newUser.getName() == null) {
@@ -39,7 +39,7 @@ public class UserController {
 
     @PutMapping
     public User update(@Valid @RequestBody User newUser) {
-        log.info("Выполнение запроса на обновление пользователя " + newUser.getLogin());
+        log.info("Выполнение запроса на обновление пользователя {}", newUser);
         userValidation(newUser);
         User updatedUser = users.get(newUser.getId());
         updatedUser.setEmail(newUser.getEmail());
@@ -58,7 +58,7 @@ public class UserController {
     }
 
     private void userValidation(User newUser) {
-        if (newUser.getEmail() == null || newUser.getEmail().isEmpty()) {
+        if (newUser.getEmail() == null || newUser.getEmail().isBlank()) {
             log.error("Пользователь не указал адрес эл.почты");
             throw new ValidationExceptions("Адрес эл.почты не указан");
         }
@@ -66,7 +66,7 @@ public class UserController {
             log.error("Пользователь указал некорректный адрес эл.почты");
             throw new ValidationExceptions("Адрес эл.почты не содержит @");
         }
-        if (newUser.getLogin().isEmpty() || newUser.getLogin().contains(" ")) {
+        if (newUser.getLogin().isBlank() || newUser.getLogin().contains(" ")) {
             log.error("Пользователь указал некорректный логин");
             throw new ValidationExceptions("Логин не может быть пустым и/или содержать пробелы");
         }
