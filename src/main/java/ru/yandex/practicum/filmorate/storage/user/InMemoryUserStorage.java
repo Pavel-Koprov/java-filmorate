@@ -1,7 +1,9 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
+import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationExceptions;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -39,6 +41,14 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User update(User newUser) {
         log.info("Выполнение запроса на обновление пользователя {}", newUser);
+        if (newUser.getId() == null) {
+            log.error("Не указан id пользователя {}", newUser);
+            throw new ValidationException("Id пользователя должен быть указан");
+        }
+        if (!users.containsKey(newUser.getId())) {
+            log.error("Пользователь с id = {} не найден", newUser.getId());
+            throw new NotFoundException(String.format("Пользователя с id = %d нет в базе", newUser.getId()));
+        }
         userValidation(newUser);
         User updatedUser = users.get(newUser.getId());
         updatedUser.setEmail(newUser.getEmail());

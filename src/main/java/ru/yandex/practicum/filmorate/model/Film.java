@@ -1,9 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
 
@@ -14,14 +11,14 @@ import java.util.Set;
 @Data
 @Builder
 public class Film {
-    private int id;
-    @NotBlank(message = "Название не может быть пустым")
+    private Integer id;
+    @NotNull
     private String name;
-    @Size(max = 200, message = "Описание не может быть пустым")
+    @NotNull
     private String description;
-    @NotNull(message = "Дата релиза не может быть пустой")
+    @NotNull
     private LocalDate releaseDate;
-    @Positive(message = "Длительность не может быть отрицательной")
+    @NotNull
     private Long duration;
     Set<Long> likes;
 

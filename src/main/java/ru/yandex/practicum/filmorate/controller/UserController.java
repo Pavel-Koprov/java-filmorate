@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,12 +29,12 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public User create(@Valid @RequestBody User newUser) {
+    public User create(@RequestBody User newUser) {
         return userService.create(newUser);
     }
 
     @PutMapping
-    public User update(@Valid @RequestBody User newUser) {
+    public User update(@RequestBody User newUser) {
         return userService.update(newUser);
     }
 
