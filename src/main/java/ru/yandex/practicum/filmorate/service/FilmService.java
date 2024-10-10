@@ -35,8 +35,13 @@ public class FilmService {
         return filmStorage.update(newFilm);
     }
 
-    public Optional<Film> findFilmById(long filmId) {
-        return filmStorage.findFilmById(filmId);
+    public Film findFilmById(long filmId) {
+        Optional<Film> optFilm = filmStorage.findFilmById(filmId);
+
+        if (optFilm.isPresent()) {
+            return optFilm.get();
+        }
+        throw new NotFoundException(String.format("Фильм с id = %d не найден", filmId));
     }
 
     public void addLike(long filmId, long userId) {

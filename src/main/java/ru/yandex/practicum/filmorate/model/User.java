@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.model;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Past;
 import lombok.Builder;
 import lombok.Data;
 
@@ -12,13 +14,13 @@ import java.util.Set;
 @Builder
 public class User {
     private Long id;
-    @NotNull
-    @NotNull
+    @Email(message = "Введите адрес эл.почты в корректном формате")
+    @NotBlank(message = "Адрес эл.почты не может быть пустым")
     private String email;
-    @NotNull
+    @NotBlank(message = "Логин не может быть пустым")
     private String login;
     private String name;
-    @NotNull
+    @Past(message = "Дата рождения не может быть в будущем")
     private LocalDate birthday;
     Set<Long> friends;
 

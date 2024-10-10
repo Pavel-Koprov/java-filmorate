@@ -17,7 +17,7 @@ import java.util.Optional;
 @Slf4j
 public class InMemoryFilmStorage implements FilmStorage {
 
-    private final Map<Integer, Film> films = new HashMap<>();
+    private final Map<Long, Film> films = new HashMap<>();
     private int filmId = 0;
     private static final LocalDate MOVIE_BIRTHDAY = LocalDate.of(1895, 12, 28);
     private static final Long MAX_DESCRIPTION_LENGTH = 200L;
@@ -60,10 +60,10 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Optional<Film> findFilmById(long filmId) {
         log.info("Выполнение запроса на получение фильма по его id");
-        return films.values()
-                .stream()
-                .filter(film -> film.getId() == filmId)
-                .findFirst();
+        if (films.containsKey(filmId)) {
+            return Optional.of(films.get(filmId));
+        }
+        return Optional.empty();
     }
 
     private void filmValidation(Film newFilm) {
@@ -85,7 +85,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
     }
 
-    private int getNextId() {
+    private long getNextId() {
         return ++filmId;
     }
 }

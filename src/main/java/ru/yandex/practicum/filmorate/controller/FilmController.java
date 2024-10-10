@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
+
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
@@ -40,11 +40,7 @@ public class FilmController {
 
     @GetMapping("/{filmId}")
     public Film getFilmById(@PathVariable("filmId") long filmId) {
-        Optional<Film> optFilm = filmService.findFilmById(filmId);
-        if (optFilm.isPresent()) {
-            return optFilm.get();
-        }
-        throw new NotFoundException(String.format("Фильм с id = %d не найден", filmId));
+        return filmService.findFilmById(filmId);
     }
 
     @PutMapping("/{id}/like/{userId}")

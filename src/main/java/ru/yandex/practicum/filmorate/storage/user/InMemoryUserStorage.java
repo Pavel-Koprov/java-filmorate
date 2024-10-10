@@ -70,10 +70,10 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public Optional<User> findUserById(long userId) {
         log.info("Поступил запрос GET на получение данных о пользователе с id = {}", userId);
-        return users.values()
-                .stream()
-                .filter(user -> user.getId() == userId)
-                .findFirst();
+        if (users.containsKey(userId)) {
+            return Optional.of(users.get(userId));
+        }
+        return Optional.empty();
     }
 
     private long getNextId() {

@@ -31,8 +31,12 @@ public class UserService {
         return userStorage.update(newUser);
     }
 
-    public Optional<User> findUserById(long userId) {
-        return userStorage.findUserById(userId);
+    public User findUserById(long userId) {
+        Optional<User> optUser = userStorage.findUserById(userId);
+        if (optUser.isPresent()) {
+            return optUser.get();
+        }
+        throw new NotFoundException(String.format("Пользователь с id = %d не найден", userId));
     }
 
     public List<User> getAllFriends(long userId) {
@@ -100,11 +104,6 @@ public class UserService {
             if (user.getFriends().contains(friendId)) {
                 user.removeFriend(friendId);
                 friend.removeFriend(userId);
-            } else {
-                log.error("Пользователь с id = {} в друзьях у пользователя с id = {} не найден",
-                        friendId, userId);
-                throw new NotFoundException(String.format("Пользователь с id = %d в друзьях у пользователя с id = %d не " +
-                        "найден", friendId, userId));
             }
         }
     }
@@ -138,15 +137,8 @@ public class UserService {
                 return commonFriends.stream()
                         .map(userStorage::getUserById)
                         .toList();
-            } else {
-                log.error("У пользователей с id = {} и id = {} нет общих друзей", userId, friendId);
-                throw new NotFoundException(String.format("У пользователей с id = %d и id = %d нет общих друзей",
-                        userId, friendId));
             }
-        } else {
-            log.error("У пользователей с id = {} и id = {} нет общих друзей", userId, friendId);
-            throw new NotFoundException(String.format("У пользователей с id = %d и id = %d нет общих друзей",
-                    userId, friendId));
         }
+        return null;
     }
 }
