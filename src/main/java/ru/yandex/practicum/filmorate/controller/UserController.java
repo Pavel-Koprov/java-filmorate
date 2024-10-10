@@ -1,78 +1,67 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationExceptions;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
 
-    private final Map<Integer, User> users = new HashMap<>();
-    private int userId = 0;
+    private final UserService userService;
+
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping
     public Collection<User> findAll() {
-        log.info("Выполнение запроса на получение всех пользователей");
-        return users.values();
+        return userService.findAll();
     }
 
     @PostMapping
-    public User create(@Valid @RequestBody User newUser) {
-        log.info("Выполнение запроса на создание пользователя {}", newUser);
-        userValidation(newUser);
-        newUser.setId(getNextId());
-        if (newUser.getName() == null) {
-            newUser.setName(newUser.getLogin());
-        }
-        users.put(newUser.getId(), newUser);
-        return newUser;
+    @ResponseStatus(HttpStatus.CREATED)
+    public User create(@RequestBody User newUser) {
+        return userService.create(newUser);
     }
 
     @PutMapping
-    public User update(@Valid @RequestBody User newUser) {
-        log.info("Выполнение запроса на обновление пользователя {}", newUser);
-        userValidation(newUser);
-        User updatedUser = users.get(newUser.getId());
-        updatedUser.setEmail(newUser.getEmail());
-        updatedUser.setLogin(newUser.getLogin());
-        if (newUser.getName() == null) {
-            updatedUser.setName(newUser.getLogin());
-        } else {
-            updatedUser.setName(newUser.getName());
-        }
-        updatedUser.setBirthday(newUser.getBirthday());
-        return updatedUser;
+    public User update(@RequestBody User newUser) {
+        return userService.update(newUser);
     }
 
-    private int getNextId() {
-        return ++userId;
+    @GetMapping("/{id}")
+    public User getUserById(@PathVariable("id") long id) {
+        return userService.findUserById(id);
     }
 
-    private void userValidation(User newUser) {
-        if (newUser.getEmail() == null || newUser.getEmail().isBlank()) {
-            log.error("Пользователь не указал адрес эл.почты");
-            throw new ValidationExceptions("Адрес эл.почты не указан");
-        }
-        if (!newUser.getEmail().contains("@")) {
-            log.error("Пользователь указал некорректный адрес эл.почты");
-            throw new ValidationExceptions("Адрес эл.почты не содержит @");
-        }
-        if (newUser.getLogin().isBlank() || newUser.getLogin().contains(" ")) {
-            log.error("Пользователь указал некорректный логин");
-            throw new ValidationExceptions("Логин не может быть пустым и/или содержать пробелы");
-        }
-        if (newUser.getBirthday().isAfter(LocalDate.now())) {
-            log.error("Пользователь указал некорректную дату рождения");
-            throw new ValidationExceptions("Дата рождения не может быть в будущем");
-        }
+    @PutMapping("/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable("id") long id,
+                          @PathVariable("friendId") long friendId) {
+        userService.addFriend(id, friendId);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public void removeFriend(@PathVariable("id") long id,
+                             @PathVariable("friendId") long friendId) {
+        userService.removeFriend(id, friendId);
+    }
+
+    @GetMapping("/{id}/friends")
+    public List<User> getAllFriends(@PathVariable("id") long id) {
+        return userService.getAllFriends(id);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> getCommonFriends(@PathVariable("id") long id,
+                                       @PathVariable("otherId") long otherId) {
+        return userService.getCommonFriends(id, otherId);
     }
 }
